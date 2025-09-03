@@ -16,7 +16,7 @@ let particles = [];
 // ウィンドウサイズが変更されたらキャンバスサイズも追従させる
 window.addEventListener('resize', () => {
     canvasWidth = window.innerWidth;
-    canvasHeight = window.innerHeight;
+    canvasHeight = canvas.innerHeight; // innerHeightを使用
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
 });
@@ -36,13 +36,14 @@ class Particle {
         this.opacity = 1;         // 透明度
         this.gravity = 0.03;      // 重力
         this.friction = 0.99;     // 摩擦
+        this.radius = random(1.5, 3); // パーティクルの大きさを少しランダムに
     }
 
     draw() {
         ctx.save();
         ctx.globalAlpha = this.opacity;
         ctx.beginPath();
-        ctx.arc(this.x, this.y, 2, 0, Math.PI * 2, false);
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false); // 半径を使用
         ctx.fillStyle = this.color;
         ctx.fill();
         ctx.restore();
@@ -100,12 +101,12 @@ class Firework {
     // 爆発処理
     explode() {
         // 花火の大きさに応じて粒子の数を変える
-        const particleCount = this.isBig ? 500 : 120;
+        const particleCount = this.isBig ? 1500 : 150; // 巨大花火の粒子数を大幅に増加
         const angleIncrement = (Math.PI * 2) / particleCount;
 
         for (let i = 0; i < particleCount; i++) {
             // 爆発の強さをランダムにする
-            const power = this.isBig ? random(2, 12) : random(1, 5);
+            const power = this.isBig ? random(5, 18) : random(2, 6); // 巨大花火の爆発の強さも増加
             const velocity = {
                 x: Math.cos(angleIncrement * i) * power,
                 y: Math.sin(angleIncrement * i) * power
@@ -144,21 +145,18 @@ function animate() {
 
 // 小さな花火を定期的に打ち上げる関数
 function startSmallFireworks() {
+    // 複数の花火が同時に上がるように、短い間隔で複数回打ち上げ処理を予約
     setInterval(() => {
-        const x = random(canvasWidth * 0.1, canvasWidth * 0.9);
-        const targetY = random(canvasHeight * 0.1, canvasHeight * 0.5);
-        const color = `hsl(${random(0, 360)}, 100%, 50%)`; // HSL色空間でカラフルな色を生成
-        fireworks.push(new Firework(x, canvasHeight, targetY, color, false));
-        
-        // ほぼ同時に複数上がるように、短い時間差でもう一つ打ち上げる
-        setTimeout(() => {
-             const x2 = random(canvasWidth * 0.1, canvasWidth * 0.9);
-             const targetY2 = random(canvasHeight * 0.1, canvasHeight * 0.5);
-             const color2 = `hsl(${random(0, 360)}, 100%, 50%)`;
-             fireworks.push(new Firework(x2, canvasHeight, targetY2, color2, false));
-        }, random(200, 700));
-
-    }, 800); // 0.8秒ごとに打ち上げ
+        const numFireworksPerInterval = random(2, 5); // 2～5個の花火を同時に打ち上げる
+        for (let i = 0; i < numFireworksPerInterval; i++) {
+            setTimeout(() => {
+                const x = random(canvasWidth * 0.1, canvasWidth * 0.9);
+                const targetY = random(canvasHeight * 0.1, canvasHeight * 0.6); // 少し低めにも打ち上がるように
+                const color = `hsl(${random(0, 360)}, 100%, 50%)`; // HSL色空間でカラフルな色を生成
+                fireworks.push(new Firework(x, canvasHeight, targetY, color, false));
+            }, random(0, 700)); // 0～0.7秒のランダムな遅延で打ち上げ
+        }
+    }, 500); // 0.5秒ごとに新しいグループの花火を打ち上げる
 }
 
 // 最初に巨大な花火を1つだけ打ち上げる
