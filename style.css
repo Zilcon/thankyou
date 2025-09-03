@@ -1,72 +1,41 @@
+/* ページ全体のスタイル */
 body {
-    background-color: #000;
-    overflow: hidden;
     margin: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+    overflow: hidden; /* スクロールバーを非表示にする */
+    background-color: #000; /* 背景を真っ黒にする */
+    font-family: 'Yu Mincho', 'Hiragino Mincho ProN', serif;
 }
 
-.firework {
+/* 花火キャンバスのスタイル */
+#fireworksCanvas {
+    display: block;
     position: absolute;
-    width: 4px;
-    height: 4px;
-    background-color: #fff;
-    border-radius: 50%;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    animation: shoot 2s ease-out forwards;
+    top: 0;
+    left: 0;
 }
 
+/* メッセージのスタイル */
 .message {
-    opacity: 0;
-    color: #fff;
-    font-family: 'Hiragino Mincho ProN', 'MS PMincho', serif;
-    text-align: center;
-    animation: fadeIn 2s ease-in forwards;
-    animation-delay: 2s; /* 花火が爆発するタイミングに合わせる */
-}
-
-h1 {
-    font-size: 3rem;
-    text-shadow: 0 0 10px #ffd700, 0 0 20px #ffd700;
-}
-
-/* 花火が打ち上がるアニメーション */
-@keyframes shoot {
-    0% {
-        bottom: 0;
-        opacity: 1;
-    }
-    100% {
-        bottom: 70%;
-        opacity: 0;
-    }
-}
-
-/* メッセージがフェードインするアニメーション */
-@keyframes fadeIn {
-    0% {
-        opacity: 0;
-        transform: scale(0.5);
-    }
-    100% {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-/* 花火のパーティクル */
-.particle {
     position: absolute;
-    width: 6px;
-    height: 6px;
-    background-color: red; /* パーティクルの色 */
-    border-radius: 50%;
-    top: 70%;
+    top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%); /* 上下左右中央に配置 */
+    
+    color: #fff;
+    font-size: 5vw; /* 画面サイズに応じて文字サイズを調整 */
+    text-align: center;
+    white-space: nowrap; /* 文字が折り返さないようにする */
+    
+    /* 文字に光彩効果をつける */
+    text-shadow: 0 0 10px #ffee99, 0 0 20px #ffee99, 0 0 40px #ffc400;
+    
+    /* 最初は非表示にしておく */
     opacity: 0;
+    
+    /* 1.5秒かけてフワッと表示されるアニメーション */
+    transition: opacity 1.5s ease-in-out;
+    
+    /* メッセージがクリックなどを邪魔しないようにする */
+    pointer-events: none;
+    z-index: 10;
 }
