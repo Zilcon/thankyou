@@ -16,7 +16,7 @@ let particles = [];
 // ウィンドウサイズが変更されたらキャンバスサイズも追従させる
 window.addEventListener('resize', () => {
     canvasWidth = window.innerWidth;
-    canvasHeight = canvas.innerHeight; // innerHeightを使用
+    canvasHeight = window.innerHeight;
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
 });
@@ -76,14 +76,11 @@ class Firework {
     }
 
     update() {
-        // 爆発していなければ、目標の高さまで上昇
         if (!this.exploded) {
             this.trail.y += this.velocity.y;
-            // 目標の高さに達したら爆発
             if (this.trail.y <= this.targetY) {
                 this.explode();
                 this.exploded = true;
-                // もし巨大花火ならメッセージを表示し、背景花火を開始
                 if (this.isBig) {
                     message.style.opacity = 1;
                     startSmallFireworks();
@@ -100,13 +97,23 @@ class Firework {
     
     // 爆発処理
     explode() {
-        // 花火の大きさに応じて粒子の数を変える
-        const particleCount = this.isBig ? 1500 : 150; // 巨大花火の粒子数を大幅に増加
+        // ★★★ スマートフォン向けの調整 (ここから変更) ★★★
+        const isMobile = canvasWidth <= 768; // スマホサイズかどうかを判定
+        let particleCount;
+
+        if (this.isBig) {
+            // 巨大花火: スマホなら数を減らし、PCなら豪華に
+            particleCount = isMobile ? 800 : 1500;
+        } else {
+            // 小さな花火
+            particleCount = isMobile ? 100 : 150;
+        }
+        // ★★★ (ここまで変更) ★★★
+        
         const angleIncrement = (Math.PI * 2) / particleCount;
 
         for (let i = 0; i < particleCount; i++) {
-            // 爆発の強さをランダムにする
-            const power = this.isBig ? random(5, 18) : random(2, 6); // 巨大花火の爆発の強さも増加
+            const power = this.isBig ? random(isMobile ? 4 : 5, isMobile ? 15 : 18) : random(2, 6);
             const velocity = {
                 x: Math.cos(angleIncrement * i) * power,
                 y: Math.sin(angleIncrement * i) * power
@@ -119,11 +126,9 @@ class Firework {
 // アニメーションを継続的に実行する関数
 function animate() {
     requestAnimationFrame(animate);
-    // 画面を少しずつ暗くして残像効果を出す
     ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-    // すべての花火を更新・描画
     fireworks.forEach((firework, index) => {
         if (firework.exploded) {
             fireworks.splice(index, 1);
@@ -133,7 +138,6 @@ function animate() {
         }
     });
 
-    // すべてのパーティクルを更新・描画
     particles.forEach((particle, index) => {
         if (particle.opacity <= 0) {
             particles.splice(index, 1);
@@ -145,25 +149,24 @@ function animate() {
 
 // 小さな花火を定期的に打ち上げる関数
 function startSmallFireworks() {
-    // 複数の花火が同時に上がるように、短い間隔で複数回打ち上げ処理を予約
     setInterval(() => {
-        const numFireworksPerInterval = random(2, 5); // 2～5個の花火を同時に打ち上げる
+        const numFireworksPerInterval = random(2, 5);
         for (let i = 0; i < numFireworksPerInterval; i++) {
             setTimeout(() => {
                 const x = random(canvasWidth * 0.1, canvasWidth * 0.9);
-                const targetY = random(canvasHeight * 0.1, canvasHeight * 0.6); // 少し低めにも打ち上がるように
-                const color = `hsl(${random(0, 360)}, 100%, 50%)`; // HSL色空間でカラフルな色を生成
+                const targetY = random(canvasHeight * 0.1, canvasHeight * 0.6);
+                const color = `hsl(${random(0, 360)}, 100%, 50%)`;
                 fireworks.push(new Firework(x, canvasHeight, targetY, color, false));
-            }, random(0, 700)); // 0～0.7秒のランダムな遅延で打ち上げ
+            }, random(0, 700));
         }
-    }, 500); // 0.5秒ごとに新しいグループの花火を打ち上げる
+    }, 500);
 }
 
 // 最初に巨大な花火を1つだけ打ち上げる
 function launchInitialFirework() {
     const x = canvasWidth / 2;
     const targetY = canvasHeight / 3;
-    const color = `hsl(${random(0, 360)}, 100%, 70%)`; // 少し明るい色
+    const color = `hsl(${random(0, 360)}, 100%, 70%)`;
     fireworks.push(new Firework(x, canvasHeight, targetY, color, true));
 }
 
