@@ -22,7 +22,8 @@ body {
     transform: translate(-50%, -50%); /* 上下左右中央に配置 */
     
     color: #fff;
-    font-size: 5vw; /* 画面サイズに応じて文字サイズを調整 */
+    /* PCでの基本フォントサイズ */
+    font-size: 5vw; 
     text-align: center;
     white-space: nowrap; /* 文字が折り返さないようにする */
     
@@ -38,4 +39,13 @@ body {
     /* メッセージがクリックなどを邪魔しないようにする */
     pointer-events: none;
     z-index: 10;
+}
+
+/* ★★★ スマートフォン向けの調整 (ここから追加) ★★★ */
+/* 画面幅が768px以下のデバイス（タブレットやスマホ）に適用 */
+@media screen and (max-width: 768px) {
+    .message {
+        /* スマホでは画面幅に対する文字の比率を大きくして見やすくする */
+        font-size: 10vw;
+    }
 }
